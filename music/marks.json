@@ -1,0 +1,108 @@
+{
+ "h": {
+  "marks": [
+   {
+    "name": "intro",
+    "bar": 0,
+    "bars": 4,
+    "t": 0.0
+   },
+   {
+    "name": "home",
+    "bar": 4,
+    "bars": 8,
+    "t": 10.0
+   },
+   {
+    "name": "game",
+    "bar": 12,
+    "bars": 8,
+    "t": 30.0
+   },
+   {
+    "name": "leave",
+    "bar": 20,
+    "bars": 2,
+    "t": 50.0
+   },
+   {
+    "name": "travel",
+    "bar": 22,
+    "bars": 16,
+    "t": 55.0
+   },
+   {
+    "name": "climax",
+    "bar": 38,
+    "bars": 4,
+    "t": 95.0
+   },
+   {
+    "name": "outro",
+    "bar": 42,
+    "bars": 8,
+    "t": 105.0
+   },
+   {
+    "name": "ring",
+    "bar": 50,
+    "bars": 2,
+    "t": 125.0
+   }
+  ],
+  "dur": 130.0
+ },
+ "v": {
+  "marks": [
+   {
+    "name": "intro",
+    "bar": 0,
+    "bars": 2,
+    "t": 0.0
+   },
+   {
+    "name": "home",
+    "bar": 2,
+    "bars": 6,
+    "t": 5.0
+   },
+   {
+    "name": "game",
+    "bar": 8,
+    "bars": 4,
+    "t": 20.0
+   },
+   {
+    "name": "leave",
+    "bar": 12,
+    "bars": 2,
+    "t": 30.0
+   },
+   {
+    "name": "travel",
+    "bar": 14,
+    "bars": 8,
+    "t": 35.0
+   },
+   {
+    "name": "climax",
+    "bar": 22,
+    "bars": 2,
+    "t": 55.0
+   },
+   {
+    "name": "outro",
+    "bar": 24,
+    "bars": 4,
+    "t": 60.0
+   },
+   {
+    "name": "ring",
+    "bar": 28,
+    "bars": 1,
+    "t": 70.0
+   }
+  ],
+  "dur": 72.5
+ }
+}

@@ -1,0 +1,722 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>大肥鱼的旅行</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Noto+Sans+SC:wght@400;500;700&display=swap">
+<style>
+/* One phone-sized game frame: header, scene panel, controls, fixed bottom tab bar. Single committed seaside look (light only, painted art). */
+:root{
+  --navy:#1f3468; --ink:#1c2442; --foam:#e6f4f3; --glass:#a9dbd6;
+  --paper:#fbfdff; --sand:#f1ddb7; --coral:#ee8691; --gold:#e4b04a;
+  --muted:#5e6b86; --line:#cfe0e6;
+  --display:"ZCOOL KuaiLe","PingFang SC","Microsoft YaHei",sans-serif;
+  --body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:linear-gradient(180deg,#cfeceb 0%,#e9f6f5 40%,#f3f8fb 100%);background-color:var(--foam);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.55;-webkit-tap-highlight-color:transparent}
+.app{max-width:460px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:14px calc(84px + env(safe-area-inset-bottom,0px));gap:12px}
+header{display:flex;align-items:center;justify-content:space-between;gap:8px}
+h1{font-family:var(--display);font-weight:400;font-size:25px;margin:0;color:var(--navy);letter-spacing:.04em;line-height:1.1;white-space:nowrap}
+h1 small{display:block;font-family:var(--body);font-size:10px;letter-spacing:.18em;color:var(--muted);margin-top:3px}
+.hud{display:flex;gap:6px;align-items:center}
+.coins{display:flex;align-items:center;gap:4px;background:var(--paper);border:1.5px solid var(--navy);border-radius:999px;padding:3px 10px 3px 5px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--navy)}
+.coins svg{width:22px;height:22px}
+.pill{font:500 12px var(--body);background:transparent;border:1.5px dashed var(--muted);color:var(--muted);border-radius:999px;padding:4px 9px;cursor:pointer;white-space:nowrap}
+.pill.on{border-style:solid;border-color:var(--coral);color:#b8505c;background:#fff0f1}
+button:focus-visible,[role=button]:focus-visible{outline:3px solid var(--coral);outline-offset:2px}
+button{font-family:inherit}
+
+.panel{position:relative;border-radius:22px;overflow:hidden;border:2px solid var(--navy);box-shadow:0 6px 0 var(--navy);aspect-ratio:3/2;max-width:100%;background:#cfe6ea center/cover no-repeat}
+.caption{display:flex;justify-content:space-between;align-items:baseline;gap:10px;min-height:22px}
+.caption b{font-family:var(--display);font-weight:400;font-size:18px;color:var(--navy)}
+.caption span{font-size:13px;color:var(--muted);text-align:right}
+.sec-title{font-family:var(--display);font-size:19px;color:var(--navy);margin:4px 0 0;font-weight:400}
+.tip{font-size:13px;color:var(--muted);margin:0}
+#view{display:flex;flex-direction:column;gap:12px}
+
+/* beach */
+.shimmer{position:absolute;inset:0;pointer-events:none;background:linear-gradient(115deg,transparent 0 30%,rgba(255,255,255,.35) 36%,transparent 42%);background-size:300% 100%;animation:shim 7s linear infinite;mix-blend-mode:soft-light}
+@keyframes shim{from{background-position:120% 0}to{background-position:-60% 0}}
+.spot{position:absolute;width:10.5%;aspect-ratio:1;transform:translate(-50%,-50%);border:0;background:transparent;padding:0;cursor:pointer}
+.spot svg{width:100%;height:100%;filter:drop-shadow(0 3px 0 rgba(31,52,104,.22));animation:pop .45s cubic-bezier(.3,1.6,.5,1)}
+.spot:hover svg{transform:rotate(-8deg) scale(1.06)}
+.spot.empty{pointer-events:none}
+.spot[data-s=g] svg{animation:pop .45s cubic-bezier(.3,1.6,.5,1),glint 1.8s ease-in-out infinite .5s}
+@keyframes glint{0%,100%{filter:drop-shadow(0 3px 0 rgba(31,52,104,.22))}50%{filter:drop-shadow(0 0 7px #fff3b0) drop-shadow(0 3px 0 rgba(31,52,104,.22))}}
+@keyframes pop{from{transform:scale(.2) translateY(20%);opacity:0}to{transform:none;opacity:1}}
+.float{position:absolute;font:700 17px var(--body);color:var(--navy);pointer-events:none;animation:up .9s ease-out forwards;transform:translate(-50%,-50%);text-shadow:0 0 4px #fff,0 0 2px #fff}
+@keyframes up{to{transform:translate(-50%,-170%);opacity:0}}
+.mat{position:absolute;left:4%;top:68%;width:30%;border:0;background:transparent;padding:0;cursor:pointer}
+.mat svg{width:100%;height:auto;display:block;filter:drop-shadow(0 3px 0 rgba(31,52,104,.2))}
+.mat .lbl{position:absolute;left:50%;top:-12%;transform:translateX(-50%);background:#fff;border:1.5px solid var(--navy);border-radius:999px;font:12px var(--display);color:var(--navy);padding:0 8px;white-space:nowrap}
+.guest{position:absolute;left:30%;top:60%;width:17%;border:0;background:transparent;padding:0;cursor:pointer;transform:translate(-50%,0);animation:hop 1.6s ease-in-out infinite}
+.guest img{width:100%;display:block;filter:drop-shadow(0 3px 0 rgba(31,52,104,.2))}
+.guest .ex{position:absolute;right:-8%;top:-14%;background:var(--coral);color:#fff;border:1.5px solid var(--navy);border-radius:50%;width:22px;height:22px;display:grid;place-items:center;font:700 13px var(--body)}
+@keyframes hop{0%,100%{translate:0 0}50%{translate:0 -6%}}
+
+/* room */
+.room .night{position:absolute;inset:0;background:radial-gradient(40% 50% at 3% 14%,rgba(255,200,120,.35),transparent 70%),radial-gradient(30% 40% at 97% 14%,rgba(255,200,120,.3),transparent 70%),rgba(34,40,108,.62);mix-blend-mode:multiply;pointer-events:none;transition:opacity 1s}
+.room .glow{position:absolute;inset:0;background:radial-gradient(18% 26% at 3% 14%,rgba(255,214,150,.55),transparent 70%),radial-gradient(14% 22% at 97% 14%,rgba(255,214,150,.5),transparent 70%);mix-blend-mode:screen;pointer-events:none}
+.fish{position:absolute;transform-origin:50% 100%;cursor:pointer;transition:opacity .8s}
+.fish img{height:100%;width:auto;display:block;pointer-events:none;user-select:none;-webkit-user-drag:none}
+.fish .breath{height:100%;transform-origin:50% 100%;animation:breath 3.4s ease-in-out infinite}
+@keyframes breath{0%,100%{transform:scale(1,1)}50%{transform:scale(1.012,.988)}}
+.fish.hop .breath{animation:hopb .5s cubic-bezier(.3,1.6,.5,1)}
+@keyframes hopb{0%{transform:scale(1.05,.92)}40%{transform:translateY(-8%) scale(.97,1.04)}100%{transform:none}}
+.fish.wave .breath{animation:sway 1.1s ease-in-out infinite}
+@keyframes sway{0%,100%{transform:rotate(-1.5deg)}50%{transform:rotate(1.5deg)}}
+.fish.walk{transition:left 2.7s linear,top 2.7s linear,height 2.7s linear,opacity .8s 2.1s}
+.fish.walk .breath{animation:stepbob .42s ease-in-out infinite}
+@keyframes stepbob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3%)}}
+.shadow{position:absolute;height:5%;border-radius:50%;background:radial-gradient(closest-side,rgba(60,40,30,.35),transparent);transform:translate(-50%,-50%);pointer-events:none;transition:opacity .8s}
+.note{position:absolute;left:50%;top:62%;width:16%;aspect-ratio:1.2;background:#fffdf3;border:1.5px solid var(--navy);transform:rotate(-6deg);font:11px var(--display);color:var(--navy);display:grid;place-items:center;text-align:center;line-height:1.3;padding:3px;box-shadow:0 3px 0 rgba(31,52,104,.2)}
+.bubble{position:absolute;transform:translate(-50%,-100%);background:#fff;border:2px solid var(--navy);border-radius:16px;padding:5px 11px;font-size:13px;max-width:62%;width:max-content;text-align:center;animation:pop .3s ease-out;z-index:3}
+.bubble::after{content:"";position:absolute;left:50%;bottom:-8px;width:12px;height:12px;background:#fff;border-right:2px solid var(--navy);border-bottom:2px solid var(--navy);transform:translateX(-50%) rotate(45deg)}
+.mailbox{position:absolute;left:3%;bottom:6%;border:2px solid var(--navy);background:var(--coral);color:#fff;font:14px var(--display);border-radius:12px;padding:5px 10px;cursor:pointer;box-shadow:0 3px 0 var(--navy);animation:pop .4s,nudge 2.4s ease-in-out infinite 1s;z-index:4}
+@keyframes nudge{0%,90%,100%{transform:none}93%{transform:rotate(-6deg)}96%{transform:rotate(6deg)}}
+.mailbox[hidden]{display:none}
+
+.bag{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.slot{background:var(--paper);border:2px dashed var(--muted);border-radius:16px;padding:10px 6px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;min-height:104px;justify-content:center;font:inherit;color:inherit}
+.slot.filled{border-style:solid;border-color:var(--navy);box-shadow:0 3px 0 var(--navy)}
+.slot .lbl{font-size:11px;letter-spacing:.2em;color:var(--muted)}
+.slot .nm{font-size:13px;font-weight:500;text-align:center}
+.slot:disabled{cursor:default;opacity:.85}
+.seal{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font:22px var(--display);color:#fff;border:2px solid var(--navy);flex:none}
+.seal.ghost{background:transparent;border-style:dashed;border-color:var(--muted);color:var(--muted)}
+
+/* shop */
+.shop{display:flex;flex-direction:column;gap:10px}
+.item{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;background:var(--paper);border:1.5px solid var(--line);border-radius:16px;padding:10px 12px}
+.item .t{font-weight:700;display:flex;gap:6px;align-items:baseline;flex-wrap:wrap}
+.item .t em{font-style:normal;font-weight:400;font-size:12px;color:var(--muted)}
+.item p{margin:2px 0 0;font-size:13px;color:var(--muted);min-width:0}
+.buy{font:700 14px var(--body);background:var(--navy);color:#fff;border:0;border-radius:12px;padding:8px 12px;cursor:pointer;display:flex;align-items:center;gap:4px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.buy svg{width:16px;height:16px}
+.buy:disabled{background:#c5cdd9;cursor:not-allowed}
+.cat{font:12px var(--body);letter-spacing:.24em;color:var(--muted);margin:8px 2px 0}
+.lotto{display:grid;grid-template-columns:120px 1fr;gap:12px;align-items:center;background:linear-gradient(160deg,#fff6e8,#ffe9ec);border:2px solid var(--navy);border-radius:20px;padding:12px;box-shadow:0 4px 0 var(--navy)}
+.lotto h3{font:400 20px var(--display);color:var(--navy);margin:0}
+.lotto p{margin:2px 0 8px;font-size:13px;color:var(--muted)}
+.drum{width:120px;height:110px;position:relative}
+.drum .wheel{position:absolute;left:18px;top:0;width:84px;height:84px;transition:transform 1.5s cubic-bezier(.3,.1,.2,1)}
+.drum .ball{position:absolute;left:94px;top:70px;width:18px;height:18px;border-radius:50%;border:2px solid var(--navy);opacity:0}
+.drum .ball.out{animation:drop .6s cubic-bezier(.3,1.4,.5,1) forwards}
+@keyframes drop{0%{opacity:1;transform:translate(-30px,-26px) scale(.6)}100%{opacity:1;transform:none}}
+
+/* album */
+.album{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.card-thumb{border:0;padding:6px;background:#fff;box-shadow:0 2px 0 var(--line),0 6px 14px rgba(31,52,104,.12);cursor:pointer;border-radius:4px;transform:rotate(var(--r,0deg));position:relative}
+.card-thumb img{display:block;width:100%;aspect-ratio:3/2;background:#eef3f6}
+.card-thumb .new{position:absolute;top:-6px;right:-6px;background:var(--coral);color:#fff;font:11px var(--display);padding:1px 7px;border-radius:999px}
+.card-thumb .fr{position:absolute;left:-6px;bottom:-6px;width:28px;height:26px;background:#fff;border:1.5px solid var(--navy);border-radius:50%;padding:2px}
+.card-thumb .fr img{width:100%;height:100%;aspect-ratio:auto;background:none}
+.empty-state{background:var(--paper);border:2px dashed var(--line);border-radius:18px;padding:22px;text-align:center;color:var(--muted);font-size:14px}
+
+/* treasures */
+.dest-row{background:var(--paper);border:1.5px solid var(--line);border-radius:16px;padding:8px 10px;display:grid;grid-template-columns:80px repeat(3,1fr);gap:6px;align-items:center}
+.dest-row .dn{font:15px var(--display);color:var(--navy);line-height:1.2}
+.dest-row .dn small{display:block;font:11px var(--body);color:var(--muted)}
+.tr{display:flex;flex-direction:column;align-items:center;text-align:center;gap:0}
+.tr svg{width:42px;height:42px}
+.tr b{font-size:11px;font-weight:500;line-height:1.25}
+.tr span{font-size:10px;color:var(--muted)}
+.tr.locked svg{filter:grayscale(1) brightness(1.5);opacity:.5}
+.tr.locked b{color:#a3adbf}
+.stats{display:flex;gap:8px;flex-wrap:wrap}
+.stat{flex:1 1 22%;background:var(--paper);border-radius:14px;padding:6px 10px;border:1.5px solid var(--line)}
+.stat b{display:block;font:21px var(--display);color:var(--navy);font-variant-numeric:tabular-nums}
+.stat span{font-size:11px;color:var(--muted)}
+.friends{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.friend{background:var(--paper);border:1.5px solid var(--line);border-radius:16px;padding:8px 6px;text-align:center}
+.friend img{width:62px;height:57px;display:block;margin:0 auto}
+.friend b{font:15px var(--display);color:var(--navy);display:block}
+.friend span{font-size:11px;color:var(--muted);display:block;line-height:1.35}
+.friend.unknown img{filter:brightness(0) opacity(.18)}
+.hearts{color:var(--coral);letter-spacing:1px;font-size:12px}
+.list{display:flex;flex-direction:column;gap:8px}
+
+/* tabs */
+nav{position:fixed;left:0;right:0;bottom:0;background:var(--paper);border-top:2px solid var(--navy);padding:6px max(10px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(10px,env(safe-area-inset-left,0px));z-index:20}
+nav .in{max-width:460px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr);gap:4px}
+nav button{border:0;background:transparent;font:13px var(--display);color:var(--muted);padding:6px 0 4px;border-radius:12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;position:relative}
+nav button svg{width:24px;height:24px}
+nav button[aria-selected="true"]{color:var(--navy);background:var(--foam)}
+nav .dot{position:absolute;top:3px;right:22%;width:9px;height:9px;border-radius:50%;background:var(--coral);border:1.5px solid #fff}
+
+/* modal */
+.scrim{position:fixed;inset:0;background:rgba(18,30,60,.55);display:grid;place-items:center;z-index:40;padding:20px max(16px,env(safe-area-inset-right,0px)) 20px max(16px,env(safe-area-inset-left,0px));animation:fade .2s}
+@keyframes fade{from{opacity:0}}
+.sheet{background:var(--paper);border:2px solid var(--navy);border-radius:22px;padding:18px;width:100%;max-width:420px;max-height:90vh;overflow:auto;display:flex;flex-direction:column;gap:12px;animation:pop .3s ease-out}
+.sheet h3{font:400 21px var(--display);color:var(--navy);margin:0}
+.flip{perspective:1200px;cursor:pointer}
+.flip .inner{position:relative;transition:transform .7s cubic-bezier(.4,.2,.2,1);transform-style:preserve-3d;transform:rotate(-1.2deg)}
+.flip.back .inner{transform:rotateY(180deg) rotate(1.2deg)}
+.face{background:#fff;padding:7px;box-shadow:0 6px 18px rgba(0,0,0,.18);backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.face img{display:block;width:100%;height:auto;aspect-ratio:3/2;background:#eef3f6}
+.face.rear{position:absolute;inset:0;transform:rotateY(180deg);background:#fffdf6;display:grid;grid-template-columns:1.25fr 1fr;gap:10px;padding:14px}
+.rear .msg{font:15px/26px var(--display);color:var(--navy);background:repeating-linear-gradient(180deg,transparent 0 25px,#e6dccb 25px 26px);overflow:hidden;padding-top:1px}
+.rear .sign{display:block;text-align:right}
+.rear .side{border-left:1.5px dashed #d9cdb6;padding-left:10px;display:flex;flex-direction:column;justify-content:space-between;align-items:flex-end}
+.stamp{width:62px;height:74px;background:#fff;border:2px dashed #c9b99e;padding:3px;display:grid;place-items:center;transform:rotate(3deg)}
+.stamp svg{width:46px;height:46px}
+.rear .addr{font:13px var(--display);color:var(--muted);text-align:right;line-height:1.8;width:100%;border-bottom:1px solid #e6dccb}
+.fliphint{font-size:12px;color:var(--muted);text-align:center;margin:-4px 0 0}
+.letter{font:16px var(--display);color:var(--navy);line-height:1.7;margin:0;padding:6px 4px;background:repeating-linear-gradient(180deg,transparent 0 26px,var(--line) 26px 27px)}
+.row{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
+.btn{font:700 14px var(--body);border-radius:12px;padding:9px 16px;cursor:pointer;border:2px solid var(--navy);background:var(--navy);color:#fff}
+.btn.ghost{background:transparent;color:var(--navy)}
+.pick{display:flex;flex-direction:column;gap:8px}
+.pick button{display:flex;gap:12px;align-items:center;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:8px 10px;cursor:pointer;font:inherit;color:inherit}
+.pick button small{display:block;color:var(--muted);font-size:12px}
+.gift{display:flex;gap:14px;align-items:center;background:#fff;border-radius:16px;padding:12px;border:1.5px solid var(--line)}
+.gift svg,.gift img{width:64px;height:64px;flex:none}
+.hero{display:flex;justify-content:center}
+.hero img{height:190px;width:auto;filter:drop-shadow(0 6px 0 rgba(31,52,104,.12))}
+.toast{position:fixed;left:50%;bottom:calc(86px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--navy);color:#fff;padding:8px 16px;border-radius:999px;font-size:14px;z-index:50;animation:pop .3s;white-space:nowrap;max-width:90vw;overflow:hidden;text-overflow:ellipsis}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>大肥鱼的旅行<small>WHALE MAID · TRAVEL DIARY</small></h1>
+    <div class="hud">
+      <button class="pill" id="sound" title="音乐与音效">♪ 关</button>
+      <button class="pill" id="speed" title="切换时间流速">×1</button>
+      <div class="coins" aria-label="贝壳数"><span id="coinIcon"></span><span id="coins">0</span></div>
+    </div>
+  </header>
+  <main id="view"></main>
+</div>
+<nav><div class="in" role="tablist" id="tabs"></div></nav>
+<div id="modalRoot"></div>
+
+<script>
+/* ---------- assets (filled in by build.py) ---------- */
+const IMG_SRC={
+ bg_room:"__IMG_bg_room__",bg_beach:"__IMG_bg_beach__",bg_beach_star:"__IMG_bg_beach_star__",bg_lighthouse:"__IMG_bg_lighthouse__",
+ bg_shrine:"__IMG_bg_shrine__",bg_coral:"__IMG_bg_coral__",bg_forest:"__IMG_bg_forest__",bg_onsen:"__IMG_bg_onsen__",
+ bg_station:"__IMG_bg_station__",bg_library:"__IMG_bg_library__",bg_fjord:"__IMG_bg_fjord__",
+ fish_read:"__IMG_fish_read__",fish_sleep:"__IMG_fish_sleep__",fish_eat:"__IMG_fish_eat__",fish_sew:"__IMG_fish_sew__",
+ fish_write:"__IMG_fish_write__",fish_clean:"__IMG_fish_clean__",fish_pack:"__IMG_fish_pack__",fish_back:"__IMG_fish_back__",fish_look:"__IMG_fish_look__"};
+const POSE=__POSE_META__;
+const BGM="__BGM__";
+/*__FRIENDS__*/
+/*__SOUV__*/
+const IMG={};
+const imgReady=Promise.all(Object.entries(IMG_SRC).map(([k,src])=>new Promise(r=>{const im=new Image();im.onload=im.onerror=()=>r();im.src=src;IMG[k]=im})));
+const FR_URL=Object.fromEntries(Object.entries(FR_SVG).map(([k,s])=>[k,'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(s)]));
+const FR_IMG={};
+const frReady=Promise.all(Object.entries(FR_URL).map(([k,u])=>new Promise(r=>{const im=new Image();im.onload=im.onerror=()=>r();im.src=u;FR_IMG[k]=im})));
+
+/* ---------- data ---------- */
+const NAME='大肥鱼';
+const ITEMS={
+  onigiri:{cat:'food',name:'海苔饭团',price:10,tier:1,glyph:'团',color:'#5b8f6a',desc:'朴素的饭团，适合在附近散步。'},
+  bento:{cat:'food',name:'鱼糕便当',price:25,tier:2,glyph:'糕',color:'#e08a7c',desc:'粉白相间的鱼糕，能走得更远一点。'},
+  tea:{cat:'food',name:'珍珠奶茶',price:45,tier:3,glyph:'茶',color:'#a7774f',desc:'喝完会有力气爬上雪山。'},
+  pudding:{cat:'food',name:'星星布丁',price:90,tier:4,glyph:'星',color:'#d9a83a',desc:'传说吃了会听见鲸鱼的歌。'},
+  amulet:{cat:'charm',name:'贝壳护身符',price:20,glyph:'贝',color:'#6aa9c9',desc:'运气变好，偶尔多带回一件纪念品。'},
+  bell:{cat:'charm',name:'珊瑚铃铛',price:45,glyph:'铃',color:'#ee8691',desc:'旅途中会多寄一张明信片。'},
+  cloud:{cat:'charm',name:'云朵守护符',price:80,glyph:'云',color:'#8fa6e0',desc:'据说能指引通往天空的路。'},
+  umbrella:{cat:'tool',name:'小雨伞',price:25,glyph:'伞',color:'#7c9a6d',desc:'下雨的地方也能去了。'},
+  lantern:{cat:'tool',name:'小提灯',price:30,glyph:'灯',color:'#d98a3d',desc:'夜里的森林不再可怕。'},
+  goggles:{cat:'tool',name:'潜水镜',price:50,glyph:'镜',color:'#3f7fb0',desc:'可以潜到海里去看看。'},
+};
+const CATS={food:'便当',charm:'护身符',tool:'道具'};
+/* place: feet x/y range (fractions of card), h: standing height as fraction of card height. light: scene tint for the character. */
+const DESTS=[
+ {id:'beach',bg:'beach_star',name:'星砂海滩',tier:1,req:null,place:{x:[.16,.84],y:[.76,.9],h:.5},poses:['pack','look','back','eat','sleep'],
+  light:{tint:'#ffd7c2',a:.22,rim:'#ffbf80',rimA:.5,dir:1},fx:'sparkle',
+  sv:[['星砂瓶','装满了会发光的星形沙粒。'],['海玻璃','被浪磨圆的玻璃，像一颗薄荷糖。'],['小海星','它自己爬进了口袋。']],
+  lines:['沙子里全是小星星！我装了一瓶给主人。','海浪把我的脚印擦掉了，再踩一遍～','夕阳把海染成了橘子汽水的颜色。']},
+ {id:'lighthouse',bg:'lighthouse',name:'灯塔小镇',tier:1,req:null,place:{x:[.12,.72],y:[.8,.92],h:.46},poses:['look','back','pack','write'],
+  light:{tint:'#d9c6ff',a:.28,rim:'#ffb38a',rimA:.45,dir:1},fx:'dusk',
+  sv:[['迷你灯塔','灯塔守护人送的小摆件。'],['海盐面包','镇上面包店的招牌，咸咸甜甜。'],['船锚钥匙扣','挂在背包上会叮当响。']],
+  lines:['灯塔的光每转一圈，我就许一个愿。','镇上的面包店老板说我像一条小鲸鱼。','小镇的猫跟了我三条街。']},
+ {id:'shrine',bg:'shrine',name:'雨中神社',tier:1,req:'umbrella',place:{x:[.3,.7],y:[.86,.95],h:.42},poses:['back','look','pack'],
+  light:{tint:'#c9d6cf',a:.3,rim:'#ffe2b0',rimA:.25,dir:-1},fx:'rain',umbrella:true,
+  sv:[['晴天娃娃','挂在窗边就会放晴。'],['御守','据说能保佑旅途平安。'],['「小吉」签','不算大吉，但刚刚好。']],
+  lines:['雨打在伞上的声音好好听。','在神社求了签，是「小吉」！','石阶上的青苔绿得发亮。']},
+ {id:'coral',bg:'coral',name:'珊瑚礁',tier:2,req:'goggles',place:{x:[.32,.68],y:[.78,.92],h:.46},poses:['look','back','pack'],
+  light:{tint:'#a8e6f0',a:.3,rim:'#e9ffff',rimA:.45,dir:-1},fx:'bubbles',
+  sv:[['珊瑚发卡','粉色的，和围裙很配。'],['小珍珠','从一只害羞的贝壳那里换来的。'],['海螺','放在耳边能听见海。']],
+  lines:['小鱼一直跟着我游，好像把我当成同伴了。','珊瑚是会呼吸的，我听见了。','我在海里吐了一个心形的泡泡！']},
+ {id:'forest',bg:'forest',name:'萤火森林',tier:2,req:'lantern',place:{x:[.24,.76],y:[.72,.86],h:.42},poses:['sleep','read','look','back'],
+  light:{tint:'#7f8fc6',a:.52,rim:'#e8ff9a',rimA:.5,dir:1},fx:'fireflies',lantern:true,night:true,
+  sv:[['萤火玻璃珠','里面住着一点点光。'],['红点蘑菇','只能看，不能吃。'],['橡果帽子','松鼠的小礼物。']],
+  lines:['萤火虫落在提灯上，像星星在休息。','森林好安静，我小声哼了歌。','不小心在草地上睡着了，醒来身上停满了光。']},
+ {id:'onsen',bg:'onsen',name:'雪山温泉',tier:3,req:null,place:{x:[.08,.46],y:[.78,.94],h:.46},poses:['eat','look','back','pack'],
+  light:{tint:'#dfeaff',a:.16,rim:'#ffffff',rimA:.4,dir:1},fx:'snow',
+  sv:[['温泉蛋','刚刚好的半熟。'],['小雪人','戴着粉色的小帽子，回家就化了……'],['温泉木桶','泡完澡用来装雪球。']],
+  lines:['雪落在头发上就化了，温泉好暖。','爬了好久才到山顶，腿有点酸……','在雪地上印了一个大肥鱼形状的坑。']},
+ {id:'station',bg:'station',name:'海底车站',tier:3,req:'goggles',place:{x:[.34,.82],y:[.88,.96],h:.44},poses:['read','back','look'],
+  light:{tint:'#a6aee8',a:.38,rim:'#ffb0e6',rimA:.5,dir:-1},fx:'jelly',night:true,
+  sv:[['海底车票','终点站写着「深蓝」。'],['水母小灯','软软的，会自己发光。'],['列车徽章','司机伯伯是一只老海龟。']],
+  lines:['水母们是这里的路灯。','列车没有开走，好像在等谁。','我坐在站台上看完了一本书，车还没来。']},
+ {id:'library',bg:'library',name:'云上图书馆',tier:3,req:'cloud',place:{x:[.3,.7],y:[.78,.9],h:.46},poses:['read','sleep','write','look'],
+  light:{tint:'#fff0f6',a:.1,rim:'#fff3d8',rimA:.5,dir:1},fx:'pages',
+  sv:[['云朵书签','软软的，夹在书里会变轻。'],['会飞的书','要用镇纸压住，不然会飞走。'],['羽毛笔','写出来的字会微微发光。']],
+  lines:['书架飘在云上，要跳着才能拿到书。','我借了一本关于鲸鱼的书！','云朵当椅子，软乎乎的，差点睡着。']},
+ {id:'fjord',bg:'fjord',name:'鲸歌峡湾',tier:4,req:null,place:{x:[.07,.22],y:[.775,.785],h:.3},poses:['back','look'],
+  light:{tint:'#7f95cc',a:.5,rim:'#8ff6d6',rimA:.6,dir:1},fx:'aurora',night:true,
+  sv:[['鲸歌贝壳','放在耳边能听见遥远的歌。'],['极光瓶','装了一小段会流动的光。'],['金色鲸尾','大鲸鱼留下的小小回礼。']],
+  lines:['我听见了……是很久很久以前的歌。','大鲸鱼对我摆了摆尾巴，好像在说「欢迎回来」。','极光好近，伸手就能摸到似的。']},
+];
+const DMAP=Object.fromEntries(DESTS.map(d=>[d.id,d]));
+const SV_W=[6,3,1];
+const FRIENDS={
+ crab:{name:'阿壳',kind:'寄居蟹',food:'onigiri',desc:'害羞，总是背着最喜欢的壳。',
+   hi:['……（从壳里探出头）谢谢你的饭团。','这个壳是我自己挑的，好看吗？','下次……还可以来吗？'],
+   trip:['阿壳一路都缩在我的口袋里，偶尔探头看看。','阿壳捡到了一个新壳，开心得转圈圈。']},
+ gull:{name:'咕咕',kind:'海鸥',food:'bento',desc:'话很多，知道海边所有的八卦。',
+   hi:['咕咕！鱼糕便当是我的最爱！','你知道吗，灯塔小镇的面包今天打折！','我从天上看到你家屋顶了，好小！'],
+   trip:['咕咕在天上帮我带路，结果自己迷路了。','咕咕抢了我半个饭团，又叼来一朵花道歉。']},
+ seal:{name:'年糕',kind:'海豹宝宝',food:'tea',desc:'圆滚滚，睡觉是第一爱好。',
+   hi:['（咕噜咕噜地喝着奶茶）……好甜……','我可以在这里睡一会儿吗……','大肥鱼身上有海的味道，好安心。'],
+   trip:['年糕一路上都在睡觉，好可爱。','年糕和我比赛谁更圆，我输了。']},
+};
+const SPOTS=[[14,40],[32,47],[52,54],[74,64],[90,78],[24,58],[46,68],[64,80],[84,92],[44,88],[60,95],[72,95]];
+const ACTS={
+ read:{st:'在看书',sub:'《鲸鱼环游世界》看到第 37 页了',lines:['这本书讲的是一条鲸鱼环游世界的故事～','嘘……正看到精彩的地方。','书里的鲸鱼也去了好多地方！']},
+ sew:{st:'在缝小鲸鱼',sub:'针脚歪歪扭扭，但很认真',lines:['围裙上的小鲸鱼也是我自己缝的！','嘶……扎到手指了，没事没事。','给主人也缝一只好不好？']},
+ eat:{st:'在吃饭团',sub:'腮帮子鼓鼓的',lines:['唔……好吃！','主人也要吃一口吗？','吃饱了才有力气去旅行～']},
+ write:{st:'在写日记',sub:'今天也有好多想写的事',lines:['今天的日记写：主人摸了我的头。','下次去哪里好呢……','字写歪了，不许笑！']},
+ clean:{st:'在擦窗户',sub:'窗外能看到灯塔',lines:['窗户擦得亮亮的，就能看到更远的海。','打扫完小屋，心情也变干净了！','主人，抬一下脚～']},
+ sleep:{st:'在打盹',sub:'抱着鲸鱼玩偶，呼吸软软的',lines:['（呼……呼……）','（梦话）……星星布丁……','（翻了个身，继续睡）']},
+};
+const DAY_ACTS=['read','sew','eat','write','clean','read','sleep'];
+/* room placement: feet x%, feet y% from top, base height% for s=1 pose of ~1100px */
+const ROOM_AT={read:[54,67],sew:[54,67],eat:[54,67],write:[52,67],sleep:[54,66],clean:[30,74],pack:[56,76],back:[56,76],look:[56,76]};
+const ROOM_H=58;
+
+/* ---------- state ---------- */
+const SAVE='fatfish-travel-v2';
+function freshState(){
+  return {v:2,coins:30,tickets:1,g:0,lastReal:Date.now(),speed:1,
+    inv:{onigiri:2},bag:{food:null,charm:null,tool:null},
+    status:'home',readyAt:0,leaveReal:0,trip:null,backAt:-1,
+    spots:SPOTS.map((_,i)=>({s:i%2?null:'n',next:Math.random()*30})),
+    cards:[],unread:[],souv:{},events:[],trips:0,actAt:0,act:0,seenAlbum:true,
+    picnic:{state:'empty',food:null,friend:null,at:0},friends:{},sound:false,intro:false};
+}
+let S;
+function load(){try{const r=localStorage.getItem(SAVE);if(r){const s=JSON.parse(r);if(s&&s.spots)return Object.assign(freshState(),s)}
+  const o=localStorage.getItem('xixi-travel-v1');if(o){const s=JSON.parse(o);if(s&&s.spots){const n=freshState();
+   Object.assign(n,{coins:s.coins,inv:s.inv||n.inv,cards:(s.cards||[]).map(c=>({...c,line:(c.line||'').replace(/汐汐/g,NAME)})),trips:s.trips||0,intro:true});
+   for(const [d,k] of Object.entries(s.souv||{}))n.souv[d+':0']=k;return n}}}catch(e){}return null}
+function save(){try{localStorage.setItem(SAVE,JSON.stringify(S))}catch(e){}}
+
+/* ---------- utils ---------- */
+const $=s=>document.querySelector(s);
+const rnd=(a,b)=>a+Math.random()*(b-a);
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+function mulberry(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function fmt(sec){sec=Math.max(0,Math.round(sec));const m=Math.floor(sec/60),s=sec%60;return m?`${m}分${String(s).padStart(2,'0')}秒`:`${s}秒`}
+function toast(t){document.querySelectorAll('.toast').forEach(e=>e.remove());const el=document.createElement('div');el.className='toast';el.textContent=t;document.body.appendChild(el);setTimeout(()=>el.remove(),2400)}
+function wpick(ws,r=Math.random()){let t=r*ws.reduce((a,b)=>a+b,0);for(let i=0;i<ws.length;i++){t-=ws[i];if(t<=0)return i}return ws.length-1}
+const isNight=()=>{const h=new Date().getHours();return h>=22||h<6};
+
+/* ---------- sound (WebAudio, tiny synth sfx + optional bgm) ---------- */
+let AC=null,bgmEl=null;
+function ac(){if(!AC){try{AC=new (window.AudioContext||window.webkitAudioContext)()}catch(e){}}if(AC&&AC.state==='suspended')AC.resume();return AC}
+function tone(f,t0,d,v=.12,type='sine'){const a=ac();if(!a)return;const o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.value=f;o.connect(g);g.connect(a.destination);const t=a.currentTime+t0;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v,t+.01);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.start(t);o.stop(t+d+.05)}
+const mf=m=>440*Math.pow(2,(m-69)/12);
+const SFX={
+ shell:()=>{tone(mf(88),0,.25,.09);tone(mf(95),.06,.3,.07)},
+ pearl:()=>{[88,92,95].forEach((m,i)=>tone(mf(m),i*.06,.4,.08))},
+ gold:()=>{[84,88,91,96,100].forEach((m,i)=>tone(mf(m),i*.06,.6,.08))},
+ coin:()=>{tone(mf(91),0,.18,.09,'triangle');tone(mf(96),.07,.35,.09,'triangle')},
+ tap:()=>tone(mf(84),0,.1,.06),
+ pop:()=>{tone(mf(79),0,.15,.08);tone(mf(86),.05,.2,.06)},
+ mail:()=>{[79,84,88,91].forEach((m,i)=>tone(mf(m),i*.11,.7,.08))},
+ fanfare:()=>{[72,76,79,84,88,91,96].forEach((m,i)=>tone(mf(m),i*.07,.8,.07,'triangle'))},
+ rattle:()=>{for(let i=0;i<10;i++)tone(rnd(900,1500),i*.11,.05,.03,'square')},
+};
+function sfx(k){if(S&&S.sound&&SFX[k])SFX[k]()}
+function syncBgm(){if(!BGM||BGM.startsWith('__'))return;if(S.sound){if(!bgmEl){bgmEl=new Audio(BGM);bgmEl.loop=true;bgmEl.volume=.35}bgmEl.play().catch(()=>{})}else if(bgmEl)bgmEl.pause()}
+
+/* ---------- svg bits ---------- */
+function shellSVG(type){
+  const c={n:['#f6c6b8','#d98e7d'],p:['#f4f1ff','#a99dd6'],g:['#f6d47a','#c58d1e']}[type];
+  return `<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M20 35C12 33 5 25 6 17C8 7 32 7 34 17C35 25 28 33 20 35Z" fill="${c[0]}" stroke="#1f3468" stroke-width="1.6"/>
+  <g stroke="${c[1]}" stroke-width="1.6" stroke-linecap="round" fill="none"><path d="M20 33L11 15"/><path d="M20 33L16 11"/><path d="M20 33V10"/><path d="M20 33L24 11"/><path d="M20 33L29 15"/></g>
+  <path d="M15 33h10l-2 4h-6z" fill="${c[0]}" stroke="#1f3468" stroke-width="1.4"/>${type==='p'?'<circle cx="20" cy="22" r="4" fill="#fff" stroke="#a99dd6" stroke-width="1.2"/>':''}${type==='g'?'<path d="M31 6l1.2 2.8L35 10l-2.8 1.2L31 14l-1.2-2.8L27 10l2.8-1.2z" fill="#fff"/>':''}</svg>`;
+}
+function seal(id,size){const it=ITEMS[id];return `<span class="seal" style="background:${it.color}${size?`;width:${size}px;height:${size}px;font-size:${size/2}px`:''}">${it.glyph}</span>`}
+const svSVG=key=>`<svg viewBox="0 0 48 48" aria-hidden="true">${SOUV_SVG[key]}</svg>`;
+const frImg=(id,cls='')=>`<img class="${cls}" src="${FR_URL[id]}" alt="${FRIENDS[id].name}">`;
+const ticketSVG='<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M3 7h18v3a2 2 0 0 0 0 4v3H3v-3a2 2 0 0 0 0-4z" fill="#ffe3a3" stroke="#1f3468" stroke-width="1.5"/><path d="M9 7v10" stroke="#1f3468" stroke-dasharray="1.5 1.5"/></svg>';
+const MAT_SVG=`<svg viewBox="0 0 160 90" aria-hidden="true"><defs><pattern id="gh" width="16" height="16" patternUnits="userSpaceOnUse"><rect width="16" height="16" fill="#fff4f5"/><rect width="8" height="16" fill="#f7b7c0" opacity=".7"/><rect width="16" height="8" fill="#f7b7c0" opacity=".7"/></pattern></defs>
+<path d="M14 18 150 8 156 78 6 86z" fill="url(#gh)" stroke="#1f3468" stroke-width="3" stroke-linejoin="round"/><ellipse cx="82" cy="46" rx="28" ry="12" fill="#fff" stroke="#1f3468" stroke-width="2.4"/><ellipse cx="82" cy="45" rx="19" ry="7" fill="#eef4f8"/></svg>`;
+const DRUM_SVG=`<svg viewBox="0 0 100 100" aria-hidden="true"><path d="M50 4 82 17 95 50 82 83 50 96 18 83 5 50 18 17z" fill="#ee8691" stroke="#1f3468" stroke-width="3.5" stroke-linejoin="round"/><path d="M50 18 72 27 81 50 72 73 50 82 28 73 19 50 28 27z" fill="#f6b4bb"/><circle cx="50" cy="50" r="10" fill="#fff" stroke="#1f3468" stroke-width="3"/><path d="M50 50 92 50" stroke="#1f3468" stroke-width="4" stroke-linecap="round"/></svg>`;
+const ICONS={
+ beach:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 17q3-2 6 0t6 0 6 0"/><path d="M12 14c-3-1-5-3-5-6 3-3 7-3 10 0 0 3-2 5-5 6z"/></svg>',
+ home:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4 11l8-7 8 7v9H4z"/><path d="M10 20v-5h4v5"/></svg>',
+ shop:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4 9h16l-1 11H5z"/><path d="M8 9a4 4 0 0 1 8 0"/></svg>',
+ album:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="1"/><path d="M3 15l5-4 4 3 3-2 6 4"/><circle cx="16" cy="9.5" r="1.3"/></svg>',
+ treasure:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4 10h16v10H4z"/><path d="M4 10a8 5 0 0 1 16 0"/><path d="M11 13h2v3h-2z"/></svg>',
+};
+$('#coinIcon').innerHTML=shellSVG('n');
+
+/* ---------- postcard painter ---------- */
+const CW=1200,CH=800;
+function hexA(h,a){const n=parseInt(h.slice(1),16);return `rgba(${n>>16&255},${n>>8&255},${n&255},${a})`}
+function glow(ctx,x,y,r,c){const g=ctx.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,c);g.addColorStop(1,'rgba(255,255,255,0)');ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill()}
+function star4(ctx,x,y,r,c){ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(x,y-r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.quadraticCurveTo(x,y,x,y+r);ctx.quadraticCurveTo(x,y,x-r,y);ctx.quadraticCurveTo(x,y,x,y-r);ctx.fill()}
+/* character sprite lit for the scene: tint (multiply) + rim light from one side */
+function litSprite(img,w,h,L,flip){
+  const cv=document.createElement('canvas');cv.width=Math.ceil(w);cv.height=Math.ceil(h);const c=cv.getContext('2d');
+  if(flip){c.translate(w,0);c.scale(-1,1)}c.drawImage(img,0,0,w,h);c.setTransform(1,0,0,1,0,0);
+  if(L.a>0){c.globalCompositeOperation='multiply';c.fillStyle=hexA(L.tint,1);c.globalAlpha=L.a*1.6;c.fillRect(0,0,w,h);c.globalAlpha=1;
+    c.globalCompositeOperation='destination-in';if(flip){c.translate(w,0);c.scale(-1,1)}c.drawImage(img,0,0,w,h);c.setTransform(1,0,0,1,0,0)}
+  if(L.rimA>0){const rc=document.createElement('canvas');rc.width=cv.width;rc.height=cv.height;const r=rc.getContext('2d');
+    const dx=Math.max(3,w*.02)*(L.dir||1)*(flip?1:1);
+    r.drawImage(cv,0,0);r.globalCompositeOperation='source-in';r.fillStyle=L.rim;r.fillRect(0,0,w,h);
+    r.globalCompositeOperation='destination-out';r.drawImage(cv,-dx,dx*.25);
+    c.globalCompositeOperation='screen';c.globalAlpha=L.rimA;c.drawImage(rc,0,0);c.globalAlpha=1;c.globalCompositeOperation='source-over'}
+  return cv;
+}
+function drawUmbrella(ctx,cx,top,w,col,part){
+  ctx.save();ctx.lineJoin='round';ctx.lineCap='round';
+  if(part==='handle'){ctx.strokeStyle='#5a3a2a';ctx.lineWidth=w*.03;ctx.beginPath();ctx.moveTo(cx,top-w*.02);ctx.lineTo(cx+w*.05,top+w*.42);ctx.stroke();ctx.restore();return}
+  const h=w*.34;ctx.beginPath();ctx.moveTo(cx-w/2,top);ctx.quadraticCurveTo(cx,top-h*1.5,cx+w/2,top);
+  for(let i=4;i>=-4;i--){const x=cx+i*w/8;ctx.quadraticCurveTo(x+w/16,top+h*.12,x,top)}
+  ctx.closePath();ctx.fillStyle=col;ctx.fill();ctx.strokeStyle='#1f3468';ctx.lineWidth=w*.022;ctx.stroke();
+  ctx.strokeStyle='rgba(255,255,255,.55)';ctx.lineWidth=w*.012;for(let i=-3;i<=3;i++){ctx.beginPath();ctx.moveTo(cx,top-h*.98);ctx.quadraticCurveTo(cx+i*w/10,top-h*.7,cx+i*w/8,top-2);ctx.stroke()}
+  ctx.fillStyle='#1f3468';ctx.beginPath();ctx.arc(cx,top-h*.98,w*.025,0,7);ctx.fill();ctx.restore();
+}
+function drawLantern(ctx,x,y,s){
+  glow(ctx,x,y-s*.5,s*2.6,'rgba(255,214,120,.55)');
+  ctx.save();ctx.lineWidth=s*.08;ctx.strokeStyle='#1f3468';ctx.lineJoin='round';
+  ctx.fillStyle='#d98a3d';ctx.fillRect(x-s*.42,y-s*1.2,s*.84,s*.16);ctx.strokeRect(x-s*.42,y-s*1.2,s*.84,s*.16);
+  ctx.fillStyle='#ffe9a8';ctx.fillRect(x-s*.34,y-s*1.04,s*.68,s*.86);ctx.strokeRect(x-s*.34,y-s*1.04,s*.68,s*.86);
+  ctx.fillStyle='#d98a3d';ctx.fillRect(x-s*.42,y-s*.18,s*.84,s*.18);ctx.strokeRect(x-s*.42,y-s*.18,s*.84,s*.18);
+  ctx.beginPath();ctx.arc(x,y-s*1.3,s*.2,Math.PI,0);ctx.stroke();ctx.restore();
+  glow(ctx,x,y-s*.6,s*.7,'rgba(255,250,220,.9)');
+}
+function fxLayer(ctx,fx,R,front){
+  const W=CW,H=CH;
+  if(fx==='sparkle'){for(let i=0;i<(front?14:30);i++){const x=R()*W,y=front?R()*H:H*.55+R()*H*.45,r=(front?8:3)+R()*(front?10:6);glow(ctx,x,y,r*2.2,'rgba(255,230,160,.4)');star4(ctx,x,y,r,front?'rgba(255,248,220,.85)':'#ffe7a0')}}
+  if(fx==='dusk'&&!front){for(let i=0;i<24;i++){const x=R()*W,y=R()*H*.35;star4(ctx,x,y,2+R()*4,'rgba(255,255,255,.8)')}}
+  if(fx==='dusk'&&front){for(let i=0;i<10;i++){const x=R()*W,y=H*.5+R()*H*.45;glow(ctx,x,y,14,'rgba(255,220,150,.5)');ctx.fillStyle='#fff3c8';ctx.beginPath();ctx.arc(x,y,2.4,0,7);ctx.fill()}}
+  if(fx==='rain'){ctx.save();ctx.strokeStyle=front?'rgba(235,245,255,.55)':'rgba(220,235,245,.35)';ctx.lineWidth=front?2.2:1.4;ctx.lineCap='round';for(let i=0;i<(front?90:160);i++){const x=R()*W*1.1,y=R()*H,l=front?36+R()*30:18+R()*16;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x-l*.22,y+l);ctx.stroke()}ctx.restore();
+    if(!front){ctx.save();ctx.strokeStyle='rgba(255,255,255,.4)';ctx.lineWidth=1.6;for(let i=0;i<16;i++){const x=R()*W,y=H*.84+R()*H*.15;ctx.beginPath();ctx.ellipse(x,y,10+R()*14,3+R()*3,0,0,7);ctx.stroke()}ctx.restore()}}
+  if(fx==='bubbles'||fx==='jelly'){ctx.save();ctx.strokeStyle=front?'rgba(255,255,255,.75)':'rgba(255,255,255,.5)';ctx.lineWidth=front?3:2;for(let i=0;i<(front?12:26);i++){const x=R()*W,y=R()*H*.85,r=(front?9:4)+R()*(front?16:9);ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.stroke();ctx.fillStyle='rgba(255,255,255,.7)';ctx.beginPath();ctx.arc(x-r*.35,y-r*.35,r*.22,0,7);ctx.fill()}ctx.restore()}
+  if(fx==='bubbles'&&!front){ctx.save();ctx.globalCompositeOperation='screen';const g=ctx.createLinearGradient(0,0,W*.3,H);g.addColorStop(0,'rgba(255,255,230,.35)');g.addColorStop(1,'rgba(255,255,255,0)');ctx.fillStyle=g;for(let i=0;i<4;i++){const x=R()*W;ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x+60,0);ctx.lineTo(x+260,H);ctx.lineTo(x+120,H);ctx.fill()}ctx.restore()}
+  if(fx==='jelly'&&!front){for(let i=0;i<5;i++)glow(ctx,R()*W,R()*H*.5,120,'rgba(255,140,220,.18)')}
+  if(fx==='fireflies'){for(let i=0;i<(front?16:40);i++){const x=R()*W,y=H*.15+R()*H*.8,r=front?5:2.6;glow(ctx,x,y,r*7,'rgba(220,255,120,.5)');ctx.fillStyle='#fbffd2';ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.fill()}}
+  if(fx==='snow'){for(let i=0;i<(front?40:110);i++){const x=R()*W,y=R()*H,r=front?3+R()*5:1.2+R()*2.6;ctx.fillStyle=`rgba(255,255,255,${front?.85:.9})`;ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.fill()}
+    if(!front){for(let i=0;i<5;i++)glow(ctx,W*.55+R()*W*.4,H*.55+R()*H*.25,90+R()*60,'rgba(255,255,255,.35)')}}
+  if(fx==='pages'){for(let i=0;i<(front?6:14);i++){const x=R()*W,y=R()*H*.7,s=front?16:8;ctx.save();ctx.translate(x,y);ctx.rotate((R()-.5)*.8);ctx.fillStyle='#fffaf0';ctx.strokeStyle='#8a7fb0';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(-s*2,-s);ctx.lineTo(-s*2,s*.2);ctx.closePath();ctx.moveTo(0,0);ctx.lineTo(s*2,-s);ctx.lineTo(s*2,s*.2);ctx.closePath();ctx.fill();ctx.stroke();ctx.restore()}
+    for(let i=0;i<(front?10:24);i++){const x=R()*W,y=R()*H;star4(ctx,x,y,3+R()*6,'rgba(255,250,235,.9)')}}
+  if(fx==='aurora'){for(let i=0;i<(front?12:30);i++){const x=R()*W,y=R()*H*.9,r=front?6:2.5;glow(ctx,x,y,r*5,'rgba(140,255,215,.35)');star4(ctx,x,y,r,'rgba(235,255,250,.9)')}}
+}
+const cardCache=new Map();
+function poseFor(dest,R){const d=DMAP[dest];return d.poses[Math.floor(R()*d.poses.length)]}
+function paintCard(card){
+  const key=card.dest+':'+card.seed+':'+(card.friend||'')+':'+(card.pose||'');if(cardCache.has(key))return cardCache.get(key);
+  const cv=document.createElement('canvas');cv.width=CW;cv.height=CH;const ctx=cv.getContext('2d');
+  const R=mulberry(card.seed);const d=DMAP[card.dest];const bg=IMG['bg_'+d.bg];
+  // background: cover-crop with a little random zoom/offset
+  const z=1+R()*.12,bw=bg.naturalWidth/z,bh=bg.naturalHeight/z,ox=R()*(bg.naturalWidth-bw),oy=(.4+R()*.6)*(bg.naturalHeight-bh);
+  ctx.drawImage(bg,ox,oy,bw,bh,0,0,CW,CH);
+  // map scene fraction coords through the crop
+  const mx=f=>(f*bg.naturalWidth-ox)/bw*CW,my=f=>(f*bg.naturalHeight-oy)/bh*CH;
+  fxLayer(ctx,d.fx,mulberry(card.seed+1),false);
+  const pose=card.pose||poseFor(card.dest,R);const P=POSE[pose];const img=IMG['fish_'+pose];
+  const hh=d.place.h*CH*z*(P.h/1100)*P.s*(0.92+R()*.16);const ww=hh*P.w/P.h;
+  const fx_=mx(d.place.x[0]+R()*(d.place.x[1]-d.place.x[0])),fy=my(d.place.y[0]+R()*(d.place.y[1]-d.place.y[0]));
+  const flip=pose==='back'||pose==='write'?false:R()<.5;
+  let cx=fx_;const lpad=ww*(flip?1-P.cx:P.cx);cx=Math.max(lpad+16,Math.min(CW-(ww-lpad)-16,cx));const left=cx-lpad,top=fy-hh;
+  // glow + contact shadow
+  if(d.night)glow(ctx,cx,fy-hh*.5,hh*.9,hexA(d.light.rim,.22));
+  ctx.save();ctx.globalCompositeOperation='multiply';const sg=ctx.createRadialGradient(cx,fy,0,cx,fy,ww*.5);sg.addColorStop(0,'rgba(40,30,60,.45)');sg.addColorStop(1,'rgba(40,30,60,0)');ctx.fillStyle=sg;ctx.beginPath();ctx.ellipse(cx,fy-hh*.01,ww*.5,hh*.07,0,0,7);ctx.fill();ctx.restore();
+  // friend
+  let frDraw=null;
+  if(card.friend&&FR_IMG[card.friend]){const fi=FR_IMG[card.friend];const fh=hh*(.36/((P.h/1100)*P.s));const fw=fh*120/110;
+    const side=(cx>CW*.55?-1:1);let fxp=cx+side*(ww*.45+fw*.55);fxp=Math.max(fw*.6,Math.min(CW-fw*.6,fxp));
+    frDraw=()=>{ctx.save();ctx.globalCompositeOperation='multiply';ctx.fillStyle='rgba(40,30,60,.3)';ctx.beginPath();ctx.ellipse(fxp,fy,fw*.4,fh*.07,0,0,7);ctx.fill();ctx.restore();
+      const sp=litSprite(fi,fw,fh,{...d.light,rimA:d.light.rimA*.6},side<0);ctx.drawImage(sp,fxp-fw/2,fy-fh*.97)}}
+  const ucol=R()<.5?'#ee8691':'#7c9adf',ux=cx+(flip?-1:1)*ww*.03,uy=top+hh*.1,uw=Math.min(ww*1.3,hh*1.05);
+  if(d.umbrella)drawUmbrella(ctx,ux,uy,uw,ucol,'handle');
+  ctx.drawImage(litSprite(img,ww,hh,d.light,flip),left,top);
+  if(d.umbrella)drawUmbrella(ctx,ux,uy,uw,ucol,'canopy');
+  if(d.lantern)drawLantern(ctx,cx+(cx>CW/2?-1:1)*ww*.6,fy,hh*.13);
+  frDraw&&frDraw();
+  if(d.id==='coral'||d.id==='station'){ctx.strokeStyle='rgba(255,255,255,.8)';ctx.lineWidth=2.4;for(let i=0;i<4;i++){ctx.beginPath();ctx.arc(cx+ww*.25+i*5,top-10-i*26,5+i*3,0,7);ctx.stroke()}}
+  fxLayer(ctx,d.fx,mulberry(card.seed+2),true);
+  // grade + vignette
+  ctx.save();ctx.globalCompositeOperation='soft-light';ctx.fillStyle='rgba(255,230,200,.25)';ctx.fillRect(0,0,CW,CH);ctx.restore();
+  const vg=ctx.createRadialGradient(CW/2,CH*.45,CH*.35,CW/2,CH*.5,CH*.95);vg.addColorStop(0,'rgba(20,20,40,0)');vg.addColorStop(1,'rgba(20,20,40,.32)');ctx.fillStyle=vg;ctx.fillRect(0,0,CW,CH);
+  // postmark
+  ctx.save();ctx.translate(CW-130,112);ctx.rotate(-.22);ctx.strokeStyle='rgba(255,255,255,.75)';ctx.fillStyle='rgba(255,255,255,.8)';ctx.lineWidth=4;
+  ctx.shadowColor='rgba(20,30,60,.45)';ctx.shadowBlur=6;
+  ctx.beginPath();ctx.arc(0,0,74,0,7);ctx.stroke();ctx.beginPath();ctx.arc(0,0,61,0,7);ctx.stroke();
+  ctx.textAlign='center';ctx.font='25px "ZCOOL KuaiLe"';ctx.fillText(d.name,0,-6);ctx.font='20px "Noto Sans SC"';ctx.fillText(card.date,0,26);
+  ctx.lineWidth=3;for(let i=0;i<4;i++){ctx.beginPath();ctx.moveTo(-180-i*4,-28+i*18);ctx.bezierCurveTo(-150,-40+i*18,-120,-16+i*18,-88,-28+i*18);ctx.stroke()}ctx.restore();
+  const url=cv.toDataURL('image/jpeg',.88);cardCache.set(key,url);return url;
+}
+
+/* ---------- game logic ---------- */
+function rollShell(){const r=Math.random();return r<.03?'g':r<.15?'p':'n'}
+const SHELL_VAL={n:1,p:5,g:20};
+function chooseDest(bag){
+  const food=ITEMS[bag.food].tier,keys=[bag.tool,bag.charm].filter(Boolean);
+  if(bag.charm==='amulet'&&Math.random()<.06)return 'fjord';
+  const el=DESTS.filter(d=>d.tier<=food&&(!d.req||keys.includes(d.req)));
+  const ws=el.map(d=>{let w=1;if(d.req&&keys.includes(d.req))w=7;else if(d.tier===food)w=3;if(!S.souv[d.id+':0'])w*=1.6;return w});
+  return el[wpick(ws)].id;
+}
+const DUR=[[150,240],[210,360],[300,480],[420,660]];
+function dateStr(){const d=new Date();return `${String(d.getFullYear()).slice(2)}.${d.getMonth()+1}.${d.getDate()}`}
+function makeCard(t){const seed=(Math.random()*2**31)|0;const d=DMAP[t.dest];const R=mulberry(seed^0x5bd1);
+  const withF=t.friend&&Math.random()<.75;let line=pick(d.lines);if(withF)line+=pick(FRIENDS[t.friend].trip);
+  return {dest:t.dest,seed,date:dateStr(),line,pose:poseFor(t.dest,R),friend:withF?t.friend:null}}
+function pickTripFriend(){const ids=Object.keys(S.friends).filter(k=>S.friends[k]>=1);if(!ids.length||Math.random()>.5)return null;return ids[wpick(ids.map(k=>S.friends[k]))]}
+function process(){
+  let changed=false,guard=0;
+  while(guard++<50){
+    if(S.status==='home'&&S.bag.food&&S.g>=S.readyAt){S.status='leaving';S.leaveReal=Date.now()+5200;changed=true;continue}
+    if(S.status==='leaving'&&Date.now()>=S.leaveReal){
+      const bag=S.bag,dest=chooseDest(bag),tier=ITEMS[bag.food].tier,[a,b]=DUR[tier-1],len=rnd(a,b);
+      const n=1+(bag.charm==='bell'?1:0)+(Math.random()<.35?1:0);
+      const cardsAt=Array.from({length:n},(_,i)=>S.g+len*(0.25+0.6*(i+Math.random()*.6)/n)).sort((x,y)=>x-y);
+      S.trip={dest,start:S.g,end:S.g+len,cardsAt,bag:{...bag},friend:pickTripFriend()};S.bag={food:null,charm:null,tool:null};S.status='away';changed=true;continue}
+    if(S.status==='away'){
+      const t=S.trip;
+      if(t.cardsAt.length&&S.g>=t.cardsAt[0]){t.cardsAt.shift();const c=makeCard(t);S.cards.push(c);S.unread.push(c.seed);S.seenAlbum=false;toast('信箱里有一张新的明信片');sfx('mail');changed=true;continue}
+      if(S.g>=t.end){
+        while(t.cardsAt.length){t.cardsAt.shift();const c=makeCard(t);S.cards.push(c);S.unread.push(c.seed)}
+        const extra=t.bag.charm==='amulet'&&Math.random()<.4?1:0;const coins=Math.round(rnd(4,10)*ITEMS[t.bag.food].tier);
+        const got=[];for(let i=0;i<1+extra;i++){const k=t.dest+':'+wpick(SV_W);S.souv[k]=(S.souv[k]||0)+1;got.push(k)}
+        S.coins+=coins;S.tickets=(S.tickets||0)+1;S.trips++;
+        S.events.push({dest:t.dest,coins,got,friend:t.friend});S.trip=null;S.status='home';S.backAt=S.g;S.readyAt=S.g+rnd(60,140);changed=true;continue}
+    }
+    break;
+  }
+  const p=S.picnic;if(p.state==='waiting'&&S.g>=p.at){p.state='visiting';changed=true;beachDirty=true;toast(`${FRIENDS[p.friend].name}来海滩做客了`);sfx('pop')}
+  S.spots.forEach(sp=>{if(!sp.s&&S.g>=sp.next){sp.s=rollShell();changed=true;beachDirty=true}});
+  if(S.g>=S.actAt){S.act=(S.act+1)%DAY_ACTS.length;S.actAt=S.g+rnd(50,90);if(tab==='home'&&S.status==='home')homeDirty=true}
+  return changed;
+}
+function curAct(){if(isNight())return 'sleep';return DAY_ACTS[S.act%DAY_ACTS.length]}
+
+/* ---------- views ---------- */
+let tab='home',beachDirty=true,homeDirty=false,bubbleT=null;
+const TABS=[['beach','海滩'],['home','小屋'],['shop','商店'],['album','相册'],['treasure','宝物']];
+function renderTabs(){
+  $('#tabs').innerHTML=TABS.map(([id,n])=>`<button role="tab" aria-selected="${tab===id}" data-tab="${id}">${ICONS[id]}${n}${(id==='album'&&!S.seenAlbum)||(id==='home'&&S.unread.length)||(id==='beach'&&S.picnic.state==='visiting')?'<i class="dot"></i>':''}</button>`).join('');
+}
+$('#tabs').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;sfx('tap');tab=b.dataset.tab;if(tab==='album')S.seenAlbum=true;beachDirty=true;render();window.scrollTo(0,0)});
+function render(){renderTabs();$('#coins').textContent=S.coins;const v=$('#view');
+  ({beach:renderBeach,home:renderHome,shop:renderShop,album:renderAlbum,treasure:renderTreasure})[tab](v);}
+
+function renderBeach(v){
+  if(!v.querySelector('#beach')){v.innerHTML=`<div class="caption"><b>家门口的海滩</b><span id="bstat"></span></div>
+    <div class="panel" id="beach" style="background-image:url(${IMG_SRC.bg_beach})"><div class="shimmer"></div><div id="picnic"></div></div>
+    <p class="tip">海浪会把贝壳冲上岸，点一下就能捡。粉色珍珠贝值 5 枚，金贝值 20 枚。<br>在野餐垫上放一份食物，也许会有朋友来做客。</p>`;
+    const b=$('#beach');SPOTS.forEach(([x,y],i)=>{const el=document.createElement('button');el.className='spot';el.style.left=x+'%';el.style.top=y+'%';el.dataset.i=i;b.appendChild(el)});
+    b.addEventListener('click',e=>{const el=e.target.closest('.spot');if(!el)return;const sp=S.spots[+el.dataset.i];if(!sp.s)return;
+      const val=SHELL_VAL[sp.s];sfx({n:'shell',p:'pearl',g:'gold'}[sp.s]);S.coins+=val;sp.s=null;sp.next=S.g+rnd(15,45);
+      const f=document.createElement('div');f.className='float';f.textContent='+'+val;f.style.left=el.style.left;f.style.top=el.style.top;b.appendChild(f);setTimeout(()=>f.remove(),900);
+      beachDirty=true;save();$('#coins').textContent=S.coins;updateBeach()});
+    beachDirty=true}
+  updateBeach();
+}
+function updateBeach(){if(!beachDirty)return;beachDirty=false;
+  document.querySelectorAll('.spot').forEach(el=>{const sp=S.spots[+el.dataset.i];const want=sp.s||'';if(el.dataset.s===want)return;el.dataset.s=want;el.classList.toggle('empty',!sp.s);el.innerHTML=sp.s?shellSVG(sp.s):'';el.setAttribute('aria-label',sp.s?'捡贝壳':'空沙地')});
+  const n=S.spots.filter(s=>s.s).length;const st=$('#bstat');if(st)st.textContent=`沙滩上有 ${n} 枚贝壳`;
+  const pc=$('#picnic');if(!pc)return;const p=S.picnic;const key=p.state+(p.friend||'');if(pc.dataset.k===key)return;pc.dataset.k=key;
+  pc.innerHTML=`<button class="mat" id="mat" aria-label="野餐垫">${MAT_SVG}${p.state==='empty'?'<span class="lbl">放点吃的？</span>':''}${p.food&&p.state!=='empty'?`<span style="position:absolute;left:41%;top:30%;width:22%">${seal(p.food,26)}</span>`:''}</button>`+
+   (p.state==='visiting'?`<button class="guest" id="guest" aria-label="和${FRIENDS[p.friend].name}说话">${frImg(p.friend)}<span class="ex">!</span></button>`:'');
+  $('#mat').onclick=()=>{if(p.state==='empty')openPicnic();else if(p.state==='waiting')toast('食物摆好了，等等看有谁会来吧');else talkGuest()};
+  $('#guest')&&($('#guest').onclick=talkGuest);
+}
+function openPicnic(){
+  const owned=Object.keys(ITEMS).filter(id=>ITEMS[id].cat==='food'&&(S.inv[id]||0)>0);
+  modal(`<h3>摆上野餐垫</h3><p class="tip">不同的食物会吸引不同的朋友。放上去的食物会被吃掉哦。</p><div class="pick">
+   ${owned.map(id=>`<button data-id="${id}">${seal(id,38)}<span><b>${ITEMS[id].name}</b> ×${S.inv[id]}<small>${foodHint(id)}</small></span></button>`).join('')||'<div class="empty-state">仓库里没有食物，去商店买一点吧。</div>'}
+   </div><div class="row"><button class="btn ghost" data-act="close">关闭</button></div>`,el=>{
+    el.querySelectorAll('.pick button').forEach(b=>b.onclick=()=>{const id=b.dataset.id;S.inv[id]--;const fr=Object.keys(FRIENDS).find(k=>FRIENDS[k].food===id)||pick(Object.keys(FRIENDS));
+      S.picnic={state:'waiting',food:id,friend:fr,at:S.g+rnd(20,50)};sfx('pop');closeModal();save();beachDirty=true;render()});
+    el.querySelector('[data-act=close]').onclick=closeModal});
+}
+function foodHint(id){const k=Object.keys(FRIENDS).find(k=>FRIENDS[k].food===id);if(!k)return '香甜的气味会飘得很远……';return S.friends[k]!=null?`${FRIENDS[k].name}最喜欢这个`:'好像有谁很喜欢这个……'}
+function talkGuest(){
+  const p=S.picnic;if(p.state!=='visiting')return;const id=p.friend,f=FRIENDS[id];const first=S.friends[id]==null;
+  S.friends[id]=(S.friends[id]||0)+1;const lv=S.friends[id];
+  const tk=Math.random()<.35;const coins=Math.round(rnd(6,16));if(tk)S.tickets=(S.tickets||0)+1;else S.coins+=coins;
+  S.picnic={state:'empty',food:null,friend:null,at:0};save();sfx('fanfare');
+  modal(`<h3>${first?`认识了新朋友：${f.name}`:`${f.name}来做客了`}</h3><div class="gift">${frImg(id)}<div><b>${f.name}</b> · ${f.kind}<br><span class="hearts">${'♥'.repeat(Math.min(5,lv))}${'♡'.repeat(Math.max(0,5-lv))}</span><br><span style="color:var(--muted);font-size:13px">${f.desc}</span></div></div>
+   <p class="letter">「${pick(f.hi)}」</p><p class="tip">回礼：${tk?'福引券 ×1':`${coins} 枚贝壳`}${first?`<br>以后${f.name}可能会和${NAME}一起去旅行。`:''}</p>
+   <div class="row"><button class="btn" data-a="c">挥挥手</button></div>`,el=>{el.querySelector('[data-a=c]').onclick=()=>{closeModal();beachDirty=true;render()}});
+}
+
+function statusText(){
+  if(S.status==='away'){const el=S.g-S.trip.start;return [`${NAME}出门旅行了`,`已经出发 ${fmt(el)}，不知道去了哪里`]}
+  if(S.status==='leaving')return ['出发啦！','背上小背包，戴好草帽'];
+  if(S.backAt>=0&&S.g-S.backAt<25)return ['旅行回来了！','晒黑了一点点（并没有）'];
+  if(S.bag.food&&S.g<S.readyAt)return S.readyAt-S.g<12?['在检查行李','马上就要出发了……']:['旅行回来，正在休息',`看到行李了，${fmt(S.readyAt-S.g)}后会想出门`];
+  if(S.bag.food)return ['盯着行李看','好像很想出门……'];
+  const a=ACTS[curAct()];return [a.st,isNight()?'夜深了，小屋里只剩下呼吸声':a.sub];
+}
+function homePose(){
+  if(S.status==='away')return null;
+  if(S.status==='leaving')return Date.now()<S.leaveReal-2900?'pack':'back';
+  if((S.backAt>=0&&S.g-S.backAt<25)||S.bag.food)return 'pack';
+  return curAct();
+}
+function fishBox(pose){const P=POSE[pose];const [x,y]=ROOM_AT[pose];const h=ROOM_H*(P.h/1100)*P.s;return {x,y,h,cx:P.cx}}
+let shownPose=null,walkT=null;
+function renderHome(v){
+  const away=S.status==='away',leaving=S.status==='leaving',lock=away||leaving;
+  const [st,sub]=statusText();const pose=homePose();shownPose=pose;
+  let fishHTML='';
+  if(pose){const b=fishBox(pose);
+    fishHTML=`<div class="shadow" style="left:${b.x}%;top:${b.y-1}%;width:${b.h*.5}%"></div><div class="fish ${pose==='pack'?'wave':''}" id="fish" role="button" tabindex="0" aria-label="和${NAME}说话" style="left:${b.x}%;top:${b.y-b.h}%;height:${b.h}%;transform:translateX(-${b.cx*100}%)"><div class="breath"><img src="${IMG_SRC['fish_'+pose]}" alt="${NAME}"></div></div>`}
+  v.innerHTML=`<div class="caption"><b id="st">${st}</b><span id="sub">${sub}</span></div>
+  <div class="panel room" id="room" style="background-image:url(${IMG_SRC.bg_room})">
+   ${away?`<div class="note">出门了～<br>— ${NAME}</div>`:''}
+   ${fishHTML}
+   ${isNight()?'<div class="night"></div><div class="glow"></div>':''}
+   <button class="mailbox" id="mail" ${S.unread.length?'':'hidden'}>信箱 · ${S.unread.length}</button></div>
+  <h2 class="sec-title">旅行背包</h2>
+  <div class="bag">${['food','charm','tool'].map(c=>{const id=S.bag[c];return `<button class="slot ${id?'filled':''}" data-c="${c}" ${lock?'disabled':''}>
+    <span class="lbl">${CATS[c]}</span>${id?seal(id):`<span class="seal ghost">＋</span>`}<span class="nm">${id?ITEMS[id].name:(c==='food'?'必须带':'可不带')}</span></button>`}).join('')}</div>
+  <p class="tip">${lock?'旅途中背包锁住了，等她回来再整理吧。':'点格子从仓库里挑选。去哪里由她自己决定，但带的东西会影响目的地。'}</p>`;
+  v.querySelectorAll('.slot').forEach(b=>b.onclick=()=>openPicker(b.dataset.c));
+  const fish=$('#fish');
+  if(fish){const talk=()=>{if(S.status!=='home')return;sfx('pop');fish.classList.remove('hop');void fish.offsetWidth;fish.classList.add('hop');
+      const line=S.bag.food?'行李收拾好了，我等一下就出发～':(S.backAt>=0&&S.g-S.backAt<25)?'我回来啦！路上有好多好玩的事！':pick(ACTS[curAct()].lines);showBubble(line)};
+    fish.onclick=talk;fish.onkeydown=e=>{if(e.key==='Enter'||e.key===' ')talk()}}
+  if(leaving&&pose==='pack'){showBubble('我出发啦～',2600);clearTimeout(walkT);
+    walkT=setTimeout(()=>{if(S.status==='leaving'&&tab==='home')renderHome($('#view'))},Math.max(0,S.leaveReal-2900-Date.now()))}
+  if(leaving&&pose==='back'){const f=$('#fish');const sh=$('#room .shadow');const th=ROOM_H*.7*POSE.back.s*(POSE.back.h/1100);
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{f.classList.add('walk');f.style.left='84%';f.style.top=(56-th)+'%';f.style.height=th+'%';f.style.opacity='0';sh&&(sh.style.opacity=0)}))}
+  $('#mail').onclick=openMail;
+}
+function showBubble(text,ms=2600){const r=$('#room');if(!r)return;r.querySelector('.bubble')?.remove();const f=$('#fish');let x=50,y=20;
+  if(f){x=parseFloat(f.style.left);y=Math.max(14,parseFloat(f.style.top)+2)}
+  const bb=document.createElement('div');bb.className='bubble';bb.textContent=text;bb.style.left=Math.min(70,Math.max(30,x))+'%';bb.style.top=y+'%';r.appendChild(bb);clearTimeout(bubbleT);bubbleT=setTimeout(()=>bb.remove(),ms)}
+function updateHome(){const t=statusText();const a=$('#st'),b=$('#sub');if(a){a.textContent=t[0];b.textContent=t[1]}
+  if(S.status==='home'&&homePose()!==shownPose)renderHome($('#view'))}
+function openPicker(cat){
+  const cur=S.bag[cat];const owned=Object.keys(ITEMS).filter(id=>ITEMS[id].cat===cat&&(S.inv[id]||0)>0);
+  modal(`<h3>放入${CATS[cat]}</h3><div class="pick">
+   ${owned.map(id=>`<button data-id="${id}">${seal(id,38)}<span><b>${ITEMS[id].name}</b> ×${S.inv[id]}<small>${ITEMS[id].desc}</small></span></button>`).join('')||'<div class="empty-state">仓库里没有这一类东西，去商店看看吧。</div>'}
+   </div><div class="row">${cur?'<button class="btn ghost" data-act="rm">取出来</button>':''}<button class="btn ghost" data-act="close">关闭</button></div>`,el=>{
+    el.querySelectorAll('.pick button').forEach(b=>b.onclick=()=>{if(cur)S.inv[cur]=(S.inv[cur]||0)+1;S.bag[cat]=b.dataset.id;S.inv[b.dataset.id]--;if(cat==='food'&&S.readyAt<=S.g)S.readyAt=S.g+8;sfx('pop');closeModal();save();render()});
+    el.querySelector('[data-act=rm]')?.addEventListener('click',()=>{S.inv[cur]=(S.inv[cur]||0)+1;S.bag[cat]=null;closeModal();save();render()});
+    el.querySelector('[data-act=close]').onclick=closeModal;});
+}
+function renderShop(v){
+  v.innerHTML=`<div class="caption"><b>海边杂货铺</b><span>买好的东西放进仓库</span></div>
+  <div class="lotto"><div class="drum"><svg viewBox="0 0 120 110" style="position:absolute;inset:0" aria-hidden="true"><path d="M30 92 44 50h32l14 42z" fill="#c98d5e" stroke="#1f3468" stroke-width="3" stroke-linejoin="round"/><rect x="18" y="90" width="84" height="10" rx="4" fill="#9d6b4a" stroke="#1f3468" stroke-width="3"/><path d="M84 84h26v8H84z" fill="#fff" stroke="#1f3468" stroke-width="2.5"/></svg><div class="wheel" id="wheel">${DRUM_SVG}</div><span class="ball" id="ball"></span></div>
+   <div><h3>海风福引</h3><p>每次旅行回来都会带回一张福引券。<br>手里有 <b id="tk">${S.tickets||0}</b> 张</p><button class="buy" id="spin" ${(S.tickets||0)<1?'disabled':''}>${ticketSVG} 转一次</button></div></div>
+  <div class="shop">`+
+  ['food','charm','tool'].map(c=>`<div class="cat">${CATS[c]}</div>`+Object.entries(ITEMS).filter(([,i])=>i.cat===c).map(([id,i])=>`
+   <div class="item">${seal(id)}<div style="min-width:0"><div class="t">${i.name}<em>仓库 ${S.inv[id]||0}</em></div><p>${i.desc}</p></div>
+   <button class="buy" data-id="${id}" ${S.coins<i.price?'disabled':''} aria-label="花 ${i.price} 枚贝壳购买${i.name}">${shellSVG('n')}${i.price}</button></div>`).join('')).join('')+`</div>`;
+  v.querySelectorAll('.buy[data-id]').forEach(b=>b.onclick=()=>{const it=ITEMS[b.dataset.id];if(S.coins<it.price)return;S.coins-=it.price;S.inv[b.dataset.id]=(S.inv[b.dataset.id]||0)+1;sfx('coin');toast(`买到了${it.name}`);save();render()});
+  $('#spin').onclick=spinLotto;
+}
+const PRIZES=[
+ {w:3,c:'#f6d47a',name:'金球',give:()=>{S.inv.pudding=(S.inv.pudding||0)+1;S.coins+=50;return '星星布丁 ×1 和 50 枚贝壳！'}},
+ {w:12,c:'#ee8691',name:'红球',give:()=>{const id=pick(['amulet','bell','cloud','umbrella','lantern','goggles']);S.inv[id]=(S.inv[id]||0)+1;return `${ITEMS[id].name} ×1`}},
+ {w:30,c:'#7fb3e6',name:'蓝球',give:()=>{const id=pick(['bento','tea']);S.inv[id]=(S.inv[id]||0)+1;return `${ITEMS[id].name} ×1`}},
+ {w:55,c:'#ffffff',name:'白球',give:()=>{S.coins+=10;return '10 枚贝壳'}},
+];
+let spinning=false;
+function spinLotto(){
+  if(spinning||(S.tickets||0)<1)return;spinning=true;S.tickets--;save();$('#spin').disabled=true;$('#tk').textContent=S.tickets;
+  const p=PRIZES[wpick(PRIZES.map(p=>p.w))];sfx('rattle');
+  const w=$('#wheel');w.style.transform=`rotate(${720+Math.random()*90}deg)`;
+  setTimeout(()=>{const b=$('#ball');if(b){b.style.background=p.c;b.classList.add('out')}sfx(p.name==='金球'?'fanfare':'coin')},1500);
+  setTimeout(()=>{const msg=p.give();save();spinning=false;
+    modal(`<h3>${p.name==='金球'?'大当たり！金球！':`转出了${p.name}`}</h3><div class="gift"><span style="width:64px;height:64px;border-radius:50%;background:${p.c};border:3px solid var(--navy);flex:none;box-shadow:inset -8px -8px 0 rgba(0,0,0,.08)"></span><div><b>${msg}</b><br><span style="color:var(--muted);font-size:13px">已经放进仓库啦。</span></div></div><div class="row"><button class="btn" data-a="c">好耶</button></div>`,
+    el=>{el.querySelector('[data-a=c]').onclick=()=>{closeModal();render()}})},2300);
+}
+function renderAlbum(v){
+  const cards=[...S.cards].reverse();
+  v.innerHTML=`<div class="caption"><b>明信片相册</b><span>${S.cards.length} 张</span></div>`+(cards.length?`<div class="album">${cards.map((c,i)=>`<button class="card-thumb" data-seed="${c.seed}" style="--r:${(i%3-1)*1.4}deg"><img alt="${DMAP[c.dest].name}的明信片" data-seed="${c.seed}">${S.unread.includes(c.seed)?'<span class="new">新</span>':''}${c.friend?`<span class="fr">${frImg(c.friend)}</span>`:''}</button>`).join('')}</div>`
+   :`<div class="empty-state">还没有收到明信片。<br>帮${NAME}打包一份便当，她旅行时会寄回来。</div>`);
+  const imgs=[...v.querySelectorAll('img[data-seed]')];let i=0;
+  ready.then(()=>{const step=()=>{if(i>=imgs.length||tab!=='album')return;const img=imgs[i++];const c=S.cards.find(x=>x.seed==img.dataset.seed);img.src=paintCard(c);setTimeout(step,16)};step()});
+  v.querySelectorAll('.card-thumb').forEach(b=>b.onclick=()=>showCard(S.cards.find(x=>x.seed==b.dataset.seed)));
+}
+function renderTreasure(v){
+  const found=DESTS.filter(d=>[0,1,2].some(i=>S.souv[d.id+':'+i])).length;
+  const nsv=Object.keys(S.souv).length;
+  v.innerHTML=`<div class="caption"><b>宝物架</b><span>去过 ${found} / ${DESTS.length} 个地方</span></div>
+  <div class="stats"><div class="stat"><b>${S.trips}</b><span>次旅行</span></div><div class="stat"><b>${S.cards.length}</b><span>张明信片</span></div><div class="stat"><b>${nsv}<small style="font-size:13px">/27</small></b><span>种纪念品</span></div><div class="stat"><b>${Object.keys(S.friends).length}</b><span>位朋友</span></div></div>
+  <h2 class="sec-title">海边的朋友</h2>
+  <div class="friends">${Object.entries(FRIENDS).map(([id,f])=>S.friends[id]!=null?`<div class="friend">${frImg(id)}<b>${f.name}</b><span class="hearts">${'♥'.repeat(Math.min(5,S.friends[id]))}</span><span>${f.kind} · 爱吃${ITEMS[f.food].name}</span></div>`
+    :`<div class="friend unknown">${frImg(id)}<b>？？？</b><span>在野餐垫上放${ITEMS[f.food].name}试试</span></div>`).join('')}</div>
+  <h2 class="sec-title">纪念品</h2>
+  <div class="list">${DESTS.map(d=>{const been=[0,1,2].some(i=>S.souv[d.id+':'+i]);
+    return `<div class="dest-row"><div class="dn">${been?d.name:'？？？'}<small>${been?'':d.req?`也许需要${ITEMS[d.req].name}`:d.tier>1?'需要更好的便当':'还没去过'}</small></div>${[0,1,2].map(i=>{const k=d.id+':'+i,n=S.souv[k];
+      return n?`<div class="tr" title="${d.sv[i][1]}">${svSVG(k)}<b>${d.sv[i][0]}</b><span>×${n}${i===2?' · 稀有':''}</span></div>`:`<div class="tr locked">${svSVG(k)}<b>？？？</b><span>${i===2?'稀有':'　'}</span></div>`}).join('')}</div>`}).join('')}</div>`;
+}
+
+/* ---------- modal ---------- */
+let modalOpen=false;
+function modal(html,bind){modalOpen=true;$('#modalRoot').innerHTML=`<div class="scrim"><div class="sheet" role="dialog" aria-modal="true">${html}</div></div>`;const el=$('#modalRoot .sheet');$('#modalRoot .scrim').onclick=e=>{if(e.target.classList.contains('scrim'))closeModal()};bind&&bind(el);el.querySelector('button')?.focus({preventScroll:true})}
+function closeModal(){modalOpen=false;$('#modalRoot').innerHTML='';setTimeout(flushEvents,300)}
+function showCard(c,next){
+  S.unread=S.unread.filter(s=>s!==c.seed);save();const d=DMAP[c.dest];
+  ready.then(()=>{modal(`<h3>来自${d.name}</h3>
+   <div class="flip" id="flip" role="button" tabindex="0" aria-label="翻面"><div class="inner"><div class="face"><img src="${paintCard(c)}" alt="${d.name}的明信片"></div>
+    <div class="face rear"><div class="msg">${c.line}<span class="sign">—— ${NAME}</span></div><div class="side"><div class="stamp">${svSVG(c.dest+':0')}</div><div class="addr">寄给：海边小屋的<br>主人 收<br>${c.date}</div></div></div></div></div>
+   <p class="fliphint">点一下明信片可以翻到背面</p>
+   <div class="row">${next?`<button class="btn" data-a="n">下一张 (${S.unread.length})</button>`:''}<button class="btn ${next?'ghost':''}" data-a="c">收好</button></div>`,el=>{
+    const f=el.querySelector('#flip');const tg=()=>{f.classList.toggle('back');sfx('tap')};f.onclick=tg;f.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();tg()}};
+    el.querySelector('[data-a=c]').onclick=()=>{closeModal();render()};el.querySelector('[data-a=n]')?.addEventListener('click',()=>{closeModal();openMail()})})});
+}
+function openMail(){if(!S.unread.length)return;sfx('mail');const c=S.cards.find(x=>x.seed===S.unread[0]);showCard(c,S.unread.length>1)}
+function flushEvents(){
+  if(modalOpen)return;
+  if(!S.intro){S.intro=true;save();modal(`<div class="hero"><img src="${IMG_SRC.fish_pack}" alt=""></div><h3>你好，主人！</h3><p class="letter">我是${NAME}，是住在这间海边小屋的鲸鱼女仆。<br>帮我在背包里放一份便当，我就会出门旅行，<br>路上会给你寄明信片哦～</p><div class="row"><button class="btn" data-a="c">请多指教</button></div>`,el=>{el.querySelector('[data-a=c]').onclick=()=>{S.sound=true;save();paintSound();syncBgm();closeModal()}});return}
+  if(!S.events.length)return;const e=S.events.shift();save();const d=DMAP[e.dest];sfx('fanfare');
+  modal(`<div class="hero"><img src="${IMG_SRC.fish_pack}" alt="" style="height:120px"></div><h3>${NAME}回来了！</h3>${e.got.map(k=>{const i=+k.split(':')[1];return `<div class="gift">${svSVG(k)}<div><b>${d.sv[i][0]}</b>${i===2?' <span style="color:#b8505c;font-size:12px">稀有！</span>':''}<br><span style="color:var(--muted);font-size:13px">${d.sv[i][1]}</span></div></div>`}).join('')}
+   <p class="letter">这次去了「${d.name}」${e.friend?`，${FRIENDS[e.friend].name}也一起去了`:''}。路上捡了 ${e.coins} 枚贝壳，都给主人！<br>还带回了一张福引券。</p><div class="row">${S.unread.length?'<button class="btn ghost" data-a="m">看明信片</button>':''}<button class="btn" data-a="c">欢迎回家</button></div>`,el=>{
+   el.querySelector('[data-a=c]').onclick=()=>{closeModal();render()};el.querySelector('[data-a=m]')?.addEventListener('click',()=>{modalOpen=false;openMail()})});
+  render();
+}
+
+/* ---------- speed + sound + loop ---------- */
+const SPEEDS=[1,10,60];
+function paintSpeed(){const b=$('#speed');b.textContent=`×${S.speed}`;b.classList.toggle('on',S.speed>1)}
+function paintSound(){const b=$('#sound');b.textContent=S.sound?'♪ 开':'♪ 关';b.classList.toggle('on',S.sound)}
+$('#speed').onclick=()=>{S.speed=SPEEDS[(SPEEDS.indexOf(S.speed)+1)%SPEEDS.length];paintSpeed();toast(S.speed>1?`时间流速 ×${S.speed}，适合心急的主人`:'恢复正常的时间流速');save()};
+$('#sound').onclick=()=>{S.sound=!S.sound;paintSound();syncBgm();sfx('pop');save()};
+document.addEventListener('pointerdown',()=>{if(S&&S.sound){ac();syncBgm()}},{once:true});
+let lastNight=null;
+function tick(){
+  const now=Date.now();let dt=(now-S.lastReal)/1000;S.lastReal=now;dt=Math.min(Math.max(dt,0),43200);S.g+=dt*S.speed;
+  const prevStatus=S.status;const ch=process();
+  const n=isNight();if(lastNight!==null&&n!==lastNight&&tab==='home')homeDirty=true;lastNight=n;
+  if(ch){$('#coins').textContent=S.coins;if(tab==='home'&&S.status!==prevStatus)render();else renderTabs();if(tab==='beach')updateBeach();if(tab==='home'){const m=$('#mail');if(m){m.hidden=!S.unread.length;m.textContent=`信箱 · ${S.unread.length}`}}save()}
+  if(tab==='home'){if(homeDirty){homeDirty=false;renderHome($('#view'))}else updateHome()}
+  flushEvents();
+}
+const ready=Promise.all([imgReady,frReady,document.fonts?Promise.all([document.fonts.load('20px "ZCOOL KuaiLe"'),document.fonts.load('11px "Noto Sans SC"')]).catch(()=>{}):Promise.resolve()]);
+let started=false;
+function start(data){
+  S=(data&&data.S)||load()||freshState();
+  if(!S.lastReal)S.lastReal=Date.now();
+  paintSpeed();paintSound();
+  render();if(!started){started=true;tick();setInterval(tick,500)}
+}
+window.claude?.hot?.snapshot?.(()=>({S}));
+imgReady.then(()=>{window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {})});
+</script>
+</body>
+</html>

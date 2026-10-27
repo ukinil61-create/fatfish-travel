@@ -1,0 +1,6 @@
+film/gp/
+film/gp_raw/
+film/frames_*/
+*.wav
+*.mp4
+__pycache__/
